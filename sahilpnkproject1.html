@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jhat Phaat Jhakaas Image & Mast Video — by sahilpnk</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --paper:#f6f3ec;
+    --paper-dim:#ece7db;
+    --line:#d9d2c1;
+    --accent:#3f6e5e;
+    --accent-bright:#5c9a82;
+    --warn:#a8531f;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding:32px 20px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  /* Header */
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .logo{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:-0.02em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo .dot{
+    width:10px;height:10px;background:var(--accent);
+    display:inline-block;border-radius:50%;
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+  .tagline{font-size:12px;color:#6b6558;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;}
+
+  /* Target size control */
+  .control-bar{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:22px;
+  }
+  .control-bar label{
+    font-family:var(--mono);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#6b6558;
+  }
+  .target-input{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 10px;
+  }
+  .target-input input{
+    width:70px;
+    border:none;
+    background:transparent;
+    font-family:var(--mono);
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink);
+    outline:none;
+  }
+  .target-input span{font-family:var(--mono);font-size:12px;color:#6b6558;}
+  .presets{display:flex;gap:6px;}
+  .preset-btn{
+    font-family:var(--mono);
+    font-size:11px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    padding:5px 9px;
+    border-radius:5px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .preset-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .preset-btn.active{background:var(--accent);color:var(--paper);border-color:var(--accent);}
+
+  /* Dropzone */
+  .dropzone{
+    border:2px dashed var(--line);
+    border-radius:14px;
+    padding:48px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:all .2s ease;
+    background:repeating-linear-gradient(135deg, var(--paper-dim) 0px, var(--paper-dim) 10px, var(--paper) 10px, var(--paper) 20px);
+    margin-bottom:26px;
+  }
+  .dropzone.drag{
+    border-color:var(--accent);
+    background:var(--paper-dim);
+  }
+  .dropzone h2{
+    font-size:17px;
+    margin:0 0 6px;
+    font-weight:600;
+  }
+  .dropzone p{
+    margin:0;
+    font-size:13px;
+    color:#6b6558;
+    font-family:var(--mono);
+  }
+  .dropzone .icon{
+    font-size:30px;
+    margin-bottom:10px;
+    display:block;
+  }
+  #fileInput{display:none;}
+
+  /* Results */
+  .results{display:flex;flex-direction:column;gap:16px;}
+  .card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .card-body{
+    display:grid;
+    grid-template-columns:120px 1fr auto;
+    gap:18px;
+    padding:16px 18px;
+    align-items:center;
+  }
+  @media (max-width:600px){
+    .card-body{grid-template-columns:70px 1fr;}
+    .card-actions{grid-column:1 / -1;}
+  }
+  .thumb{
+    width:120px;height:90px;
+    border-radius:8px;
+    overflow:hidden;
+    background:var(--paper-dim);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);
+  }
+  @media (max-width:600px){.thumb{width:70px;height:60px;}}
+  .thumb img, .thumb video{width:100%;height:100%;object-fit:cover;}
+
+  .info .fname{
+    font-weight:600;
+    font-size:14px;
+    margin-bottom:6px;
+    word-break:break-all;
+  }
+  .fname-edit{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    margin-bottom:8px;
+  }
+  .fname-input{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink);
+    border:1px solid transparent;
+    background:transparent;
+    border-radius:5px;
+    padding:3px 6px;
+    outline:none;
+    min-width:0;
+    flex:1;
+    transition:all .15s ease;
+  }
+  .fname-input:hover{background:var(--paper-dim);}
+  .fname-input:focus{
+    background:#fff;
+    border-color:var(--accent);
+  }
+  .ext-label{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#8a8474;
+    flex-shrink:0;
+  }
+  .stat-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#544f45;
+  }
+  .stat-row .arrow{color:#a39c8a;}
+  .stat-row .good{color:var(--accent);font-weight:700;}
+  .stat-row .over{color:var(--warn);font-weight:700;}
+  .progress-track{
+    height:5px;
+    background:var(--paper-dim);
+    border-radius:3px;
+    margin-top:8px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    width:0%;
+    transition:width .3s ease;
+  }
+  .progress-fill.working{
+    background:repeating-linear-gradient(45deg, var(--accent), var(--accent) 8px, var(--accent-bright) 8px, var(--accent-bright) 16px);
+    background-size:32px 32px;
+    animation:barber 1s linear infinite;
+  }
+  @keyframes barber{to{background-position:32px 0;}}
+  .status-text{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#8a8474;
+    margin-top:6px;
+  }
+
+  .card-actions{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:stretch;
+  }
+  .btn{
+    font-family:var(--mono);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:9px 16px;
+    border-radius:6px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    text-decoration:none;
+    text-align:center;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  .btn.secondary:hover{background:var(--paper-dim);border-color:var(--ink);}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  .download-all{
+    display:none;
+    margin-top:18px;
+    text-align:center;
+  }
+  .download-all.show{display:block;}
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:#a39c8a;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="dot"></span>jhat phaat jhakaas image & mast video</div>
+    <div class="tagline">by sahilpnk · images → .webp, videos → .mp4, on target size</div>
+  </header>
+
+  <div class="control-bar">
+    <label for="targetKb">Target size</label>
+    <div class="target-input">
+      <input type="number" id="targetKb" value="100" min="5" max="500000">
+      <span>KB</span>
+    </div>
+    <div class="presets" id="sizePresets">
+      <button class="preset-btn" data-kb="50">50KB</button>
+      <button class="preset-btn active" data-kb="100">100KB</button>
+      <button class="preset-btn" data-kb="200">200KB</button>
+      <button class="preset-btn" data-kb="500">500KB</button>
+      <button class="preset-btn" data-kb="5120">5MB</button>
+      <button class="preset-btn" data-kb="10240">10MB</button>
+      <button class="preset-btn" data-kb="25600">25MB</button>
+      <button class="preset-btn" data-kb="51200">50MB</button>
+    </div>
+  </div>
+
+  <div class="control-bar" id="videoResBar">
+    <label>Video resolution</label>
+    <div class="presets" id="videoResPresets">
+      <button class="preset-btn active" data-h="0">Original</button>
+      <button class="preset-btn" data-h="1080">1080p</button>
+      <button class="preset-btn" data-h="720">720p</button>
+      <button class="preset-btn" data-h="480">480p</button>
+      <button class="preset-btn" data-h="360">360p</button>
+      <button class="preset-btn" data-h="240">240p</button>
+    </div>
+    <span style="font-family:var(--mono);font-size:11px;color:#8a8474;">applies to video files only</span>
+  </div>
+
+  <div class="control-bar" id="renameBar" style="display:none;">
+    <label for="bulkPattern">Bulk rename</label>
+    <div class="target-input" style="width:auto;">
+      <input type="text" id="bulkPattern" placeholder="e.g. holiday-{n}" style="width:180px;font-weight:600;">
+    </div>
+    <span style="font-family:var(--mono);font-size:11px;color:#8a8474;">
+      {n} = number, {name} = original name
+    </span>
+    <button class="preset-btn" id="applyBulkRename" style="margin-left:auto;">Apply to all</button>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <span class="icon">⇩</span>
+    <h2>Drop images or videos here, or click to browse</h2>
+    <p>JPG · PNG · GIF · BMP · AVIF · HEIC · TIFF → WebP</p>
+    <p>MP4 · MOV · WEBM · MKV · AVI → MP4, resized to your target size</p>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <div class="download-all" id="downloadAllWrap">
+    <button class="btn" id="downloadAllBtn">Download all</button>
+  </div>
+
+  <footer>everything happens locally in your browser — nothing is uploaded anywhere</footer>
+</div>
+
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const resultsEl = document.getElementById('results');
+const targetKbInput = document.getElementById('targetKb');
+const presetBtns = document.querySelectorAll('#sizePresets .preset-btn');
+const downloadAllWrap = document.getElementById('downloadAllWrap');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const renameBar = document.getElementById('renameBar');
+const bulkPatternInput = document.getElementById('bulkPattern');
+const applyBulkRenameBtn = document.getElementById('applyBulkRename');
+
+let processedFiles = []; // {blob, nameInputEl, originalBase, ext}
+let fileCounter = 0;
+
+const videoResPresetBtns = document.querySelectorAll('#videoResPresets .preset-btn');
+let selectedVideoHeight = 0; // 0 = keep original resolution
+videoResPresetBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    videoResPresetBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedVideoHeight = parseInt(btn.dataset.h, 10) || 0;
+  });
+});
+
+applyBulkRenameBtn.addEventListener('click', ()=>{
+  const pattern = bulkPatternInput.value.trim();
+  if(!pattern) return;
+  processedFiles.forEach((f, i)=>{
+    const newName = pattern
+      .replace(/\{n\}/g, String(i+1))
+      .replace(/\{name\}/g, f.originalBase);
+    f.nameInputEl.value = sanitizeName(newName);
+  });
+});
+
+function sanitizeName(name){
+  return name.replace(/[\/\\:*?"<>|]/g, '').trim() || 'image';
+}
+
+presetBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    presetBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    targetKbInput.value = btn.dataset.kb;
+  });
+});
+targetKbInput.addEventListener('input', ()=>{
+  presetBtns.forEach(b=>b.classList.remove('active'));
+});
+
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+
+function handleFiles(fileList){
+  const files = Array.from(fileList).filter(f=> f.type.startsWith('image/') || f.type.startsWith('video/'));
+  files.forEach(f=>{
+    if(f.type.startsWith('video/')) processVideoFile(f);
+    else processFile(f);
+  });
+}
+
+function fmtSize(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  return (bytes/1024).toFixed(1) + ' KB';
+}
+
+async function loadImage(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.onload = ()=> resolve(im);
+      im.onerror = ()=> reject(new Error('img-decode-failed'));
+      im.src = url;
+    });
+    if(!img.naturalWidth || !img.naturalHeight){
+      throw new Error('img-decode-failed');
+    }
+    return { img, url };
+  } catch(e){
+    // Fallback: try decoding via createImageBitmap, which handles some
+    // formats/variants the <img> tag can't (works for most modern browsers).
+    try {
+      const bitmap = await createImageBitmap(file);
+      // Wrap the bitmap so it can be drawn just like an <img> (drawImage accepts both,
+      // and we only ever read naturalWidth/naturalHeight from it elsewhere).
+      bitmap.naturalWidth = bitmap.width;
+      bitmap.naturalHeight = bitmap.height;
+      return { img: bitmap, url };
+    } catch(e2){
+      URL.revokeObjectURL(url);
+      throw new Error('the browser could not decode this image file. It may be corrupt, or an unsupported format/variant.');
+    }
+  }
+}
+
+function canvasToBlob(canvas, quality){
+  return new Promise((resolve, reject)=>{
+    canvas.toBlob(blob=>{
+      if(!blob){ reject(new Error('this browser cannot encode WebP images (try Chrome, Edge, or Firefox)')); return; }
+      resolve(blob);
+    }, 'image/webp', quality);
+  });
+}
+
+async function compressToTarget(img, targetBytes, statusEl, progressEl){
+  // Start at original dimensions, binary search quality.
+  // If even quality 0.1 at full size is over target, scale down dimensions and retry.
+  let scale = 1.0;
+  let bestBlob = null;
+  let bestQuality = null;
+  let attempts = 0;
+  const maxAttempts = 24;
+
+  while(attempts < maxAttempts){
+    const w = Math.max(1, Math.round(img.naturalWidth * scale));
+    const h = Math.max(1, Math.round(img.naturalHeight * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Binary search quality at this scale
+    let lo = 0.05, hi = 0.98;
+    let localBest = null, localBestQ = null;
+    for(let i=0;i<8;i++){
+      attempts++;
+      const q = (lo+hi)/2;
+      const blob = await canvasToBlob(canvas, q);
+      statusEl.textContent = `trying scale ${(scale*100).toFixed(0)}% · quality ${(q*100).toFixed(0)}% · ${fmtSize(blob.size)}`;
+      progressEl.style.width = Math.min(95, (attempts/maxAttempts)*100) + '%';
+      if(blob.size <= targetBytes){
+        localBest = blob; localBestQ = q;
+        lo = q; // try higher quality within budget
+      } else {
+        hi = q;
+      }
+      if(hi-lo < 0.03) break;
+    }
+
+    if(localBest){
+      bestBlob = localBest;
+      bestQuality = localBestQ;
+      break; // found a fit at this scale, good enough
+    }
+
+    // Even lowest quality too big at this scale — shrink dimensions and retry
+    scale *= 0.75;
+    if(w <= 32 || h <= 32){
+      // give up shrinking further, accept smallest we can produce
+      const q = 0.05;
+      const blob = await canvasToBlob(canvas, q);
+      bestBlob = blob;
+      bestQuality = q;
+      break;
+    }
+  }
+
+  progressEl.style.width = '100%';
+  return { blob: bestBlob, quality: bestQuality, scale };
+}
+
+async function processFile(file){
+  const id = 'card_' + Math.random().toString(36).slice(2);
+  fileCounter++;
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  renameBar.style.display = 'flex';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-body">
+      <div class="thumb"><img id="${id}_img" src=""></div>
+      <div class="info">
+        <div class="fname-edit">
+          <input type="text" class="fname-input" id="${id}_name" value="${baseName}" spellcheck="false">
+          <span class="ext-label">.webp</span>
+        </div>
+        <div class="stat-row">
+          <span>${fmtSize(file.size)}</span>
+          <span class="arrow">→</span>
+          <span id="${id}_result">compressing…</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill working" id="${id}_progress"></div></div>
+        <div class="status-text" id="${id}_status">reading image…</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn" id="${id}_download" disabled>Download</button>
+        <button class="btn secondary" id="${id}_retry" style="display:none;">Retry</button>
+      </div>
+    </div>
+  `;
+  resultsEl.appendChild(card);
+
+  try{
+    const { img, url } = await loadImage(file);
+    document.getElementById(id+'_img').src = url;
+
+    const targetBytes = Math.max(5, parseInt(targetKbInput.value || '100', 10)) * 1024;
+    const statusEl = document.getElementById(id+'_status');
+    const progressEl = document.getElementById(id+'_progress');
+
+    const { blob, quality, scale } = await compressToTarget(img, targetBytes, statusEl, progressEl);
+    progressEl.classList.remove('working');
+
+    const resultEl = document.getElementById(id+'_result');
+    const overOrUnder = blob.size <= targetBytes ? 'good' : 'over';
+    resultEl.innerHTML = `<span class="${overOrUnder}">${fmtSize(blob.size)}</span>`;
+
+    const dims = `${Math.round(img.naturalWidth*scale)}×${Math.round(img.naturalHeight*scale)}px`;
+    statusEl.textContent = `quality ${(quality*100).toFixed(0)}% · ${dims}${scale<1 ? ' (downscaled to hit target)' : ''}`;
+
+    const nameInputEl = document.getElementById(id+'_name');
+    const dlBtn = document.getElementById(id+'_download');
+    dlBtn.disabled = false;
+    dlBtn.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = sanitizeName(nameInputEl.value) + '.webp';
+      a.click();
+    });
+
+    processedFiles.push({ blob, nameInputEl, originalBase: baseName, ext: 'webp' });
+    downloadAllWrap.classList.add('show');
+
+  } catch(err){
+    const statusEl = document.getElementById(id+'_status');
+    statusEl.textContent = 'failed to process this file: ' + err.message;
+    document.getElementById(id+'_progress').classList.remove('working');
+    document.getElementById(id+'_progress').style.background = 'var(--warn)';
+    document.getElementById(id+'_progress').style.width = '100%';
+  }
+}
+
+// ---------- Video conversion (via ffmpeg.wasm, runs entirely in the browser) ----------
+
+let ffmpegInstance = null;
+let ffmpegLoadingPromise = null;
+let ffmpegLock = Promise.resolve();
+
+function withFfmpegLock(fn){
+  const run = ffmpegLock.then(fn, fn);
+  ffmpegLock = run.then(()=>{}, ()=>{});
+  return run;
+}
+
+let ffmpegLoadListeners = new Set();
+function broadcastFfmpegStatus(text){
+  ffmpegLoadListeners.forEach(el=>{ try{ el.textContent = text; }catch(e){} });
+}
+
+async function fetchBlobURL(url, mimeType, onChunk){
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('could not download ' + url.split('/').pop() + ' (HTTP ' + resp.status + ')');
+  const total = parseInt(resp.headers.get('Content-Length') || '0', 10);
+  if(!resp.body || typeof resp.body.getReader !== 'function'){
+    const blob = await resp.blob();
+    if(onChunk) onChunk(blob.size, total || blob.size);
+    return URL.createObjectURL(new Blob([blob], { type: mimeType }));
+  }
+  const reader = resp.body.getReader();
+  const chunks = [];
+  let received = 0;
+  while(true){
+    const { done, value } = await reader.read();
+    if(done) break;
+    chunks.push(value);
+    received += value.length;
+    if(onChunk) onChunk(received, total);
+  }
+  return URL.createObjectURL(new Blob(chunks, { type: mimeType }));
+}
+
+function withTimeout(promise, ms, message){
+  let timer;
+  const timeout = new Promise((_, reject)=>{ timer = setTimeout(()=> reject(new Error(message)), ms); });
+  return Promise.race([promise, timeout]).finally(()=> clearTimeout(timer));
+}
+
+async function getFFmpeg(statusEl){
+  if(ffmpegInstance) return ffmpegInstance;
+  if(statusEl){
+    ffmpegLoadListeners.add(statusEl);
+    statusEl.textContent = 'downloading video engine… (one-time, ~30MB)';
+  }
+  if(!ffmpegLoadingPromise){
+    ffmpegLoadingPromise = (async ()=>{
+      if(!window.FFmpegWASM || !window.FFmpegUtil){
+        throw new Error('video engine script did not load (check your internet connection, or that ad-block / a firewall isn\'t blocking unpkg.com)');
+      }
+      const { FFmpeg } = window.FFmpegWASM;
+      const ffmpeg = new FFmpeg();
+      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      const ffmpegPkgURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd';
+
+      const files = [
+        { url: `${baseURL}/ffmpeg-core.js`, mime: 'text/javascript', approxBytes: 130 * 1024 },
+        { url: `${baseURL}/ffmpeg-core.wasm`, mime: 'application/wasm', approxBytes: 31 * 1024 * 1024 },
+        { url: `${ffmpegPkgURL}/814.ffmpeg.js`, mime: 'text/javascript', approxBytes: 15 * 1024 },
+      ];
+      const totalApprox = files.reduce((s, f)=> s + f.approxBytes, 0);
+      let doneBytes = 0;
+
+      async function loadWithProgress(f){
+        const blobUrl = await fetchBlobURL(f.url, f.mime, (received, total)=>{
+          const pct = Math.min(99, Math.round(((doneBytes + received) / totalApprox) * 100));
+          broadcastFfmpegStatus(`downloading video engine… ${pct}% (one-time, ~30MB)`);
+        });
+        doneBytes += f.approxBytes;
+        return blobUrl;
+      }
+
+      try{
+        const loadTask = (async ()=>{
+          const coreURL = await loadWithProgress(files[0]);
+          const wasmURL = await loadWithProgress(files[1]);
+          const classWorkerURL = await loadWithProgress(files[2]);
+          broadcastFfmpegStatus('starting video engine…');
+          await ffmpeg.load({ coreURL, wasmURL, classWorkerURL });
+        })();
+        await withTimeout(loadTask, 180000, 'video engine took too long to load — check your internet connection and try again');
+      }catch(loadErr){
+        ffmpegLoadingPromise = null; // allow retry on the next video
+        if(window.location.protocol === 'file:'){
+          throw new Error('this page was opened as a local file, which browsers block from starting the video engine. Serve this HTML through a local server (or host it online) instead of double-clicking it.');
+        }
+        throw loadErr;
+      }
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    })();
+  }
+  try{
+    return await ffmpegLoadingPromise;
+  } finally {
+    if(statusEl) ffmpegLoadListeners.delete(statusEl);
+  }
+}
+
+function loadVideoMeta(file){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    v.muted = true;
+    v.src = url;
+    v.onloadedmetadata = ()=>{
+      resolve({ duration: v.duration || 0, width: v.videoWidth, height: v.videoHeight, url });
+    };
+    v.onerror = ()=>{
+      URL.revokeObjectURL(url);
+      reject(new Error('the browser could not read this video file'));
+    };
+  });
+}
+
+function guessExt(name){
+  const m = name.match(/\.[^.]+$/);
+  return m ? m[0] : '.mp4';
+}
+
+function errText(err){
+  if(!err) return 'unknown error';
+  if(typeof err === 'string') return err;
+  if(err.message) return err.message;
+  if(err.code) return String(err.code);
+  try{ return JSON.stringify(err); }catch(e){ return String(err); }
+}
+
+async function processVideoFile(file){
+  const id = 'card_' + Math.random().toString(36).slice(2);
+  fileCounter++;
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  renameBar.style.display = 'flex';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-body">
+      <div class="thumb"><video id="${id}_vid" muted playsinline preload="metadata"></video></div>
+      <div class="info">
+        <div class="fname-edit">
+          <input type="text" class="fname-input" id="${id}_name" value="${baseName}" spellcheck="false">
+          <span class="ext-label">.mp4</span>
+        </div>
+        <div class="stat-row">
+          <span>${fmtSize(file.size)}</span>
+          <span class="arrow">→</span>
+          <span id="${id}_result">preparing…</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill working" id="${id}_progress"></div></div>
+        <div class="status-text" id="${id}_status">reading video…</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn" id="${id}_download" disabled>Download</button>
+        <button class="btn secondary" id="${id}_retry" style="display:none;">Retry</button>
+      </div>
+    </div>
+  `;
+  resultsEl.appendChild(card);
+
+  const statusEl = document.getElementById(id+'_status');
+  const progressEl = document.getElementById(id+'_progress');
+  const resultEl = document.getElementById(id+'_result');
+
+  try{
+    const meta = await loadVideoMeta(file);
+    document.getElementById(id+'_vid').src = meta.url;
+    if(!meta.width || !meta.height || !meta.duration){
+      throw new Error('could not read this video\'s dimensions or duration');
+    }
+
+    const targetBytes = Math.max(5, parseInt(targetKbInput.value || '100', 10)) * 1024;
+    const duration = meta.duration;
+
+    // Work out output dimensions from the chosen resolution preset (never upscale).
+    const wantH = selectedVideoHeight > 0 ? Math.min(selectedVideoHeight, meta.height) : meta.height;
+    const willScale = wantH < meta.height;
+    let outW = Math.round(meta.width * (wantH / meta.height));
+    let outH = wantH;
+    outW -= outW % 2; // libx264 needs even dimensions
+    outH -= outH % 2;
+
+    // Work out a bitrate budget that should land close to the target size.
+    const overheadFactor = 0.96; // leave a little headroom for container overhead
+    const totalKbps = (targetBytes * 8 * overheadFactor) / duration / 1000;
+    let audioKbps = 96;
+    let videoKbps = Math.floor(totalKbps - audioKbps);
+    if(videoKbps < 80){
+      audioKbps = 48;
+      videoKbps = Math.floor(totalKbps - audioKbps);
+    }
+    let lowQualityWarning = false;
+    if(videoKbps < 40){
+      videoKbps = 40;
+      lowQualityWarning = true;
+    }
+
+    const ffmpeg = await withFfmpegLock(()=> getFFmpeg(statusEl));
+
+    let active = true;
+    const onProgress = ({ progress })=>{
+      if(!active) return;
+      const pct = Math.min(97, Math.max(3, Math.round((progress || 0) * 100)));
+      progressEl.style.width = pct + '%';
+      statusEl.textContent = `encoding… ${pct}% · ${outW}×${outH} · ${videoKbps}kbps video`;
+    };
+    ffmpeg.on('progress', onProgress);
+
+    const logLines = [];
+    const onLog = ({ message })=>{
+      if(!active || !message) return;
+      logLines.push(message);
+      if(logLines.length > 25) logLines.shift();
+    };
+    ffmpeg.on('log', onLog);
+
+    statusEl.textContent = `queued for encoding · ${outW}×${outH} · ${videoKbps}kbps video`;
+
+    const inName = 'in_' + id + guessExt(file.name);
+    const outName = 'out_' + id + '.mp4';
+
+    const blob = await withFfmpegLock(async ()=>{
+      await ffmpeg.writeFile(inName, await window.FFmpegUtil.fetchFile(file));
+      const args = ['-i', inName];
+      if(willScale) args.push('-vf', `scale=${outW}:${outH}`);
+      args.push(
+        '-c:v','libx264','-preset','veryfast','-pix_fmt','yuv420p',
+        '-b:v', videoKbps+'k','-maxrate', videoKbps+'k','-bufsize', (videoKbps*2)+'k',
+        '-c:a','aac','-b:a', audioKbps+'k',
+        '-movflags','+faststart',
+        outName
+      );
+      const ret = await ffmpeg.exec(args);
+      if(ret !== 0){
+        throw new Error('ffmpeg could not convert this file' + (logLines.length ? ' — ' + logLines.slice(-3).join(' | ') : ' (exit code ' + ret + ')'));
+      }
+      let data;
+      try{
+        data = await ffmpeg.readFile(outName);
+      }catch(readErr){
+        throw new Error('no output was produced' + (logLines.length ? ' — ' + logLines.slice(-3).join(' | ') : '') + '. This usually means the video file itself could not be decoded (unsupported codec or corrupt file).');
+      }
+      try{ await ffmpeg.deleteFile(inName); }catch(e){}
+      try{ await ffmpeg.deleteFile(outName); }catch(e){}
+      return new Blob([data.buffer], { type: 'video/mp4' });
+    });
+
+    active = false;
+
+    progressEl.classList.remove('working');
+    progressEl.style.width = '100%';
+
+    const overOrUnder = blob.size <= targetBytes ? 'good' : 'over';
+    resultEl.innerHTML = `<span class="${overOrUnder}">${fmtSize(blob.size)}</span>`;
+    statusEl.textContent = `${outW}×${outH} · ${videoKbps}kbps video, ${audioKbps}kbps audio` +
+      (lowQualityWarning ? ' · target is very small for this length, quality will suffer' : '');
+
+    const nameInputEl = document.getElementById(id+'_name');
+    const dlBtn = document.getElementById(id+'_download');
+    dlBtn.disabled = false;
+    dlBtn.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = sanitizeName(nameInputEl.value) + '.mp4';
+      a.click();
+    });
+
+    processedFiles.push({ blob, nameInputEl, originalBase: baseName, ext: 'mp4' });
+    downloadAllWrap.classList.add('show');
+
+  } catch(err){
+    statusEl.textContent = 'failed to process this video: ' + errText(err);
+    progressEl.classList.remove('working');
+    progressEl.style.background = 'var(--warn)';
+    progressEl.style.width = '100%';
+  }
+}
+
+downloadAllBtn.addEventListener('click', ()=>{
+  processedFiles.forEach((f, i)=>{
+    setTimeout(()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(f.blob);
+      a.download = sanitizeName(f.nameInputEl.value) + '.' + (f.ext || 'webp');
+      a.click();
+    }, i * 200);
+  });
+});
+</script>
+</body>
+</html>
