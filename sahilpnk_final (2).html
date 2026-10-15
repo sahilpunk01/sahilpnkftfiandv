@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VimoraPnk — by sahilpnk</title>
+<style>
+  :root{
+    --ink:#f1eaff;
+    --paper:#0b0812;
+    --paper-dim:#170f26;
+    --line:#3d2a5c;
+    --accent:#8b5cf6;
+    --accent-bright:#c99bff;
+    --warn:#ffa94d;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(600px circle at var(--mx,50%) var(--my,15%), rgba(139,92,246,0.16), transparent 60%),
+      radial-gradient(900px circle at 90% 90%, rgba(139,60,220,0.10), transparent 60%),
+      var(--paper);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding:32px 20px 60px;
+    transition:background .1s linear;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  /* Header */
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom:2px solid var(--accent);
+    box-shadow:0 8px 24px -18px rgba(139,92,246,0.9);
+    padding-bottom:14px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .logo{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:-0.02em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-shadow:0 0 18px rgba(139,92,246,0.35);
+  }
+  .logo .dot{
+    width:10px;height:10px;background:var(--accent-bright);
+    display:inline-block;border-radius:50%;
+    box-shadow:0 0 10px 2px rgba(139,92,246,0.9);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+  .tagline{font-size:12px;color:#b3a3dd;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;}
+
+  /* Target size control */
+  .control-bar{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:22px;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .control-bar:hover{
+    border-color:var(--accent);
+    box-shadow:0 0 24px -6px rgba(139,92,246,0.45);
+  }
+  .control-bar label{
+    font-family:var(--mono);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#b3a3dd;
+  }
+  .target-input{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 10px;
+  }
+  .target-input input{
+    width:70px;
+    border:none;
+    background:transparent;
+    font-family:var(--mono);
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink);
+    outline:none;
+  }
+  .target-input span{font-family:var(--mono);font-size:12px;color:#b3a3dd;}
+  .presets{display:flex;gap:6px;}
+  .preset-btn{
+    font-family:var(--mono);
+    font-size:11px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    padding:5px 9px;
+    border-radius:5px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .preset-btn:hover{border-color:var(--accent);color:var(--accent-bright);box-shadow:0 0 14px -2px rgba(139,92,246,0.55);}
+  .preset-btn.active{background:var(--accent);color:#0b0812;border-color:var(--accent);box-shadow:0 0 18px -2px rgba(139,92,246,0.8);}
+
+  /* Dropzone */
+  .dropzone{
+    border:2px dashed var(--line);
+    border-radius:14px;
+    padding:48px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:all .2s ease;
+    background:repeating-linear-gradient(135deg, var(--paper-dim) 0px, var(--paper-dim) 10px, var(--paper) 10px, var(--paper) 20px);
+    margin-bottom:26px;
+  }
+  .dropzone:hover{
+    border-color:var(--accent-bright);
+    box-shadow:0 0 40px -8px rgba(139,92,246,0.6), inset 0 0 60px -20px rgba(139,92,246,0.3);
+  }
+  .dropzone.drag{
+    border-color:var(--accent);
+    background:var(--paper-dim);
+    box-shadow:0 0 50px -6px rgba(139,92,246,0.75);
+  }
+  .dropzone h2{
+    font-size:17px;
+    margin:0 0 6px;
+    font-weight:600;
+  }
+  .dropzone p{
+    margin:0;
+    font-size:13px;
+    color:#b3a3dd;
+    font-family:var(--mono);
+  }
+  .dropzone .icon{
+    font-size:30px;
+    margin-bottom:10px;
+    display:block;
+  }
+  #fileInput{display:none;}
+  #bgResults .thumb{background:repeating-conic-gradient(#2a1f40 0% 25%, #1b1330 0% 50%) 50% / 16px 16px;}
+
+  /* Results */
+  .results{display:flex;flex-direction:column;gap:16px;}
+  .card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#150f24;
+    overflow:hidden;
+    transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  .card:hover{
+    border-color:var(--accent);
+    box-shadow:0 10px 34px -12px rgba(139,92,246,0.55), 0 0 0 1px rgba(139,92,246,0.35);
+    transform:translateY(-2px);
+  }
+  .card-body{
+    display:grid;
+    grid-template-columns:120px 1fr auto;
+    gap:18px;
+    padding:16px 18px;
+    align-items:center;
+  }
+  @media (max-width:600px){
+    .card-body{grid-template-columns:70px 1fr;}
+    .card-actions{grid-column:1 / -1;}
+  }
+  .thumb{
+    width:120px;height:90px;
+    border-radius:8px;
+    overflow:hidden;
+    background:var(--paper-dim);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);
+  }
+  @media (max-width:600px){.thumb{width:70px;height:60px;}}
+  .thumb img, .thumb video{width:100%;height:100%;object-fit:cover;}
+
+  .info .fname{
+    font-weight:600;
+    font-size:14px;
+    margin-bottom:6px;
+    word-break:break-all;
+  }
+  .fname-edit{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    margin-bottom:8px;
+  }
+  .fname-input{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink);
+    border:1px solid transparent;
+    background:transparent;
+    border-radius:5px;
+    padding:3px 6px;
+    outline:none;
+    min-width:0;
+    flex:1;
+    transition:all .15s ease;
+  }
+  .fname-input:hover{background:var(--paper-dim);}
+  .fname-input:focus{
+    background:#1e1533;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(139,92,246,0.25);
+  }
+  .ext-label{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#8f7fb3;
+    flex-shrink:0;
+  }
+  .stat-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#d8cdf0;
+  }
+  .stat-row .arrow{color:#8f7fb3;}
+  .stat-row .good{color:var(--accent-bright);font-weight:700;}
+  .stat-row .over{color:var(--warn);font-weight:700;}
+  .progress-track{
+    height:5px;
+    background:var(--paper-dim);
+    border-radius:3px;
+    margin-top:8px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    width:0%;
+    transition:width .3s ease;
+  }
+  .progress-fill.working{
+    background:repeating-linear-gradient(45deg, var(--accent), var(--accent) 8px, var(--accent-bright) 8px, var(--accent-bright) 16px);
+    background-size:32px 32px;
+    animation:barber 1s linear infinite;
+  }
+  @keyframes barber{to{background-position:32px 0;}}
+  .status-text{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#8f7fb3;
+    margin-top:6px;
+  }
+
+  .card-actions{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:stretch;
+  }
+  .btn{
+    font-family:var(--mono);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:9px 16px;
+    border-radius:6px;
+    border:1px solid var(--accent);
+    background:linear-gradient(135deg, #7c3aed, #4c1d95);
+    color:#f5f0ff;
+    cursor:pointer;
+    text-decoration:none;
+    text-align:center;
+    transition:all .18s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{
+    background:linear-gradient(135deg, #9b6bff, #6d28d9);
+    border-color:var(--accent-bright);
+    box-shadow:0 0 20px -2px rgba(139,92,246,0.8);
+    transform:translateY(-1px);
+  }
+  .btn.secondary{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .btn.secondary:hover{background:var(--paper-dim);border-color:var(--accent);box-shadow:0 0 16px -4px rgba(139,92,246,0.6);}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+  .download-all{
+    display:none;
+    margin-top:18px;
+    text-align:center;
+  }
+  .download-all.show{display:block;}
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:#7a6a99;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="dot"></span>VimoraPnk</div>
+    <div class="tagline">by sahilpnk · images → .webp, videos → .mp4, on target size</div>
+  </header>
+
+  <div class="control-bar">
+    <label for="targetKb">Target size</label>
+    <div class="target-input">
+      <input type="number" id="targetKb" value="100" min="5" max="500000">
+      <span>KB</span>
+    </div>
+    <div class="presets" id="sizePresets">
+      <button class="preset-btn" data-kb="50">50KB</button>
+      <button class="preset-btn active" data-kb="100">100KB</button>
+      <button class="preset-btn" data-kb="200">200KB</button>
+      <button class="preset-btn" data-kb="500">500KB</button>
+      <button class="preset-btn" data-kb="5120">5MB</button>
+      <button class="preset-btn" data-kb="10240">10MB</button>
+      <button class="preset-btn" data-kb="25600">25MB</button>
+      <button class="preset-btn" data-kb="51200">50MB</button>
+    </div>
+  </div>
+
+  <div class="control-bar" id="videoResBar">
+    <label>Video resolution</label>
+    <div class="presets" id="videoResPresets">
+      <button class="preset-btn active" data-h="0">Original</button>
+      <button class="preset-btn" data-h="1080">1080p</button>
+      <button class="preset-btn" data-h="720">720p</button>
+      <button class="preset-btn" data-h="480">480p</button>
+      <button class="preset-btn" data-h="360">360p</button>
+      <button class="preset-btn" data-h="240">240p</button>
+    </div>
+    <span style="font-family:var(--mono);font-size:11px;color:#8f7fb3;">applies to video files only</span>
+  </div>
+
+  <div class="control-bar" id="renameBar" style="display:none;">
+    <label for="bulkPattern">Bulk rename</label>
+    <div class="target-input" style="width:auto;">
+      <input type="text" id="bulkPattern" placeholder="e.g. holiday-{n}" style="width:180px;font-weight:600;">
+    </div>
+    <span style="font-family:var(--mono);font-size:11px;color:#8f7fb3;">
+      {n} = number, {name} = original name
+    </span>
+    <button class="preset-btn" id="applyBulkRename" style="margin-left:auto;">Apply to all</button>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <span class="icon">⇩</span>
+    <h2>Drop images or videos here, or click to browse</h2>
+    <p>JPG · PNG · GIF · BMP · AVIF · HEIC · TIFF → WebP</p>
+    <p>MP4 · MOV · WEBM · MKV · AVI → MP4, resized to your target size</p>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <div class="download-all" id="downloadAllWrap">
+    <button class="btn" id="downloadAllBtn">Download all</button>
+  </div>
+
+  
+<!-- Separate Background Removal & Custom Background Section -->
+<section id="bgRemovalSection" style="margin-top:40px;border-top:2px solid var(--ink);padding-top:28px;">
+  <h2 style="font-family:var(--mono);font-size:18px;margin:0 0 12px;">Background removal & custom background</h2>
+  <p style="margin:0 0 16px;font-size:13px;color:#b3a3dd;">Upload images to remove their backgrounds and add a background of your choice (solid color, gradient, or your own image). This works independently from the compressor above.</p>
+
+  <!-- Controls -->
+  <div class="control-bar" id="bgToolsBar">
+    <label>Background tools</label>
+    <div class="presets" style="gap:8px;align-items:center;">
+      <button class="preset-btn" id="btnRemoveBg">Remove background</button>
+      <button class="preset-btn" id="btnClearBg">Reset</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap;">
+      <label style="font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:#b3a3dd;">Background</label>
+      <div class="presets" id="bgToggle">
+        <button class="preset-btn active" data-bgon="off" title="Keep the cut-out transparent">No background</button>
+        <button class="preset-btn" data-bgon="on" title="Put a color, gradient or image behind the cut-out">Add background</button>
+      </div>
+      <div id="bgOptions" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;">
+      <select id="bgType" style="font-family:var(--sans);font-size:13px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);">
+        <option value="solid">Solid color</option>
+        <option value="gradient">Gradient</option>
+        <option value="image">Upload image</option>
+      </select>
+      <input type="color" id="bgColor" value="#ffffff" title="Solid background color" style="width:36px;height:28px;border:1px solid var(--line);border-radius:4px;background:var(--paper);">
+      <input type="file" id="bgImageInput" accept="image/*" style="display:none;">
+      <button class="btn secondary" id="btnChooseBgImg" style="font-size:11px;padding:5px 9px;">Choose image…</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dropzone for this feature -->
+  <div class="dropzone" id="bgDropzone">
+    <span class="icon">🖼️</span>
+    <h2>Drop images here for background editing, or click to browse</h2>
+    <p>Works best with PNG/JPG/WebP</p>
+    <input type="file" id="bgFileInput" accept="image/*" multiple style="display:none;">
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="bgResults"></div>
+</section>
+<footer>everything happens locally in your browser — nothing is uploaded anywhere</footer>
+</div>
+
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+
+<script>
+// Royal violet cursor glow — follows the mouse across the page background.
+(function initCursorGlow(){
+  let raf = null, px = 50, py = 15;
+  function apply(){
+    document.body.style.setProperty('--mx', px + '%');
+    document.body.style.setProperty('--my', py + '%');
+    raf = null;
+  }
+  window.addEventListener('mousemove', (e)=>{
+    px = (e.clientX / window.innerWidth) * 100;
+    py = (e.clientY / window.innerHeight) * 100;
+    if(!raf) raf = requestAnimationFrame(apply);
+  }, { passive:true });
+  window.addEventListener('touchmove', (e)=>{
+    if(!e.touches || !e.touches[0]) return;
+    px = (e.touches[0].clientX / window.innerWidth) * 100;
+    py = (e.touches[0].clientY / window.innerHeight) * 100;
+    if(!raf) raf = requestAnimationFrame(apply);
+  }, { passive:true });
+})();
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const resultsEl = document.getElementById('results');
+const targetKbInput = document.getElementById('targetKb');
+const presetBtns = document.querySelectorAll('#sizePresets .preset-btn');
+const downloadAllWrap = document.getElementById('downloadAllWrap');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const renameBar = document.getElementById('renameBar');
+const bulkPatternInput = document.getElementById('bulkPattern');
+const applyBulkRenameBtn = document.getElementById('applyBulkRename');
+
+let processedFiles = []; // {blob, nameInputEl, originalBase, ext}
+let fileCounter = 0;
+
+const videoResPresetBtns = document.querySelectorAll('#videoResPresets .preset-btn');
+let selectedVideoHeight = 0; // 0 = keep original resolution
+videoResPresetBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    videoResPresetBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedVideoHeight = parseInt(btn.dataset.h, 10) || 0;
+  });
+});
+
+applyBulkRenameBtn.addEventListener('click', ()=>{
+  const pattern = bulkPatternInput.value.trim();
+  if(!pattern) return;
+  processedFiles.forEach((f, i)=>{
+    const newName = pattern
+      .replace(/\{n\}/g, String(i+1))
+      .replace(/\{name\}/g, f.originalBase);
+    f.nameInputEl.value = sanitizeName(newName);
+  });
+});
+
+function sanitizeName(name){
+  return name.replace(/[\/\\:*?"<>|]/g, '').trim() || 'image';
+}
+
+presetBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    presetBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    targetKbInput.value = btn.dataset.kb;
+  });
+});
+targetKbInput.addEventListener('input', ()=>{
+  presetBtns.forEach(b=>b.classList.remove('active'));
+});
+
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+
+function handleFiles(fileList){
+  const files = Array.from(fileList).filter(f=> f.type.startsWith('image/') || f.type.startsWith('video/'));
+  files.forEach(f=>{
+    if(f.type.startsWith('video/')) processVideoFile(f);
+    else processFile(f);
+  });
+}
+
+function fmtSize(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  return (bytes/1024).toFixed(1) + ' KB';
+}
+
+async function loadImage(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.onload = ()=> resolve(im);
+      im.onerror = ()=> reject(new Error('img-decode-failed'));
+      im.src = url;
+    });
+    if(!img.naturalWidth || !img.naturalHeight){
+      throw new Error('img-decode-failed');
+    }
+    return { img, url };
+  } catch(e){
+    // Fallback: try decoding via createImageBitmap, which handles some
+    // formats/variants the <img> tag can't (works for most modern browsers).
+    try {
+      const bitmap = await createImageBitmap(file);
+      // Wrap the bitmap so it can be drawn just like an <img> (drawImage accepts both,
+      // and we only ever read naturalWidth/naturalHeight from it elsewhere).
+      bitmap.naturalWidth = bitmap.width;
+      bitmap.naturalHeight = bitmap.height;
+      return { img: bitmap, url };
+    } catch(e2){
+      URL.revokeObjectURL(url);
+      throw new Error('the browser could not decode this image file. It may be corrupt, or an unsupported format/variant.');
+    }
+  }
+}
+
+function canvasToBlob(canvas, quality){
+  return new Promise((resolve, reject)=>{
+    canvas.toBlob(blob=>{
+      if(!blob){ reject(new Error('this browser cannot encode WebP images (try Chrome, Edge, or Firefox)')); return; }
+      resolve(blob);
+    }, 'image/webp', quality);
+  });
+}
+
+async function compressToTarget(img, targetBytes, statusEl, progressEl){
+  // Start at original dimensions, binary search quality.
+  // If even quality 0.1 at full size is over target, scale down dimensions and retry.
+  let scale = 1.0;
+  let bestBlob = null;
+  let bestQuality = null;
+  let attempts = 0;
+  const maxAttempts = 24;
+
+  while(attempts < maxAttempts){
+    const w = Math.max(1, Math.round(img.naturalWidth * scale));
+    const h = Math.max(1, Math.round(img.naturalHeight * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Binary search quality at this scale
+    let lo = 0.05, hi = 0.98;
+    let localBest = null, localBestQ = null;
+    for(let i=0;i<8;i++){
+      attempts++;
+      const q = (lo+hi)/2;
+      const blob = await canvasToBlob(canvas, q);
+      statusEl.textContent = `trying scale ${(scale*100).toFixed(0)}% · quality ${(q*100).toFixed(0)}% · ${fmtSize(blob.size)}`;
+      progressEl.style.width = Math.min(95, (attempts/maxAttempts)*100) + '%';
+      if(blob.size <= targetBytes){
+        localBest = blob; localBestQ = q;
+        lo = q; // try higher quality within budget
+      } else {
+        hi = q;
+      }
+      if(hi-lo < 0.03) break;
+    }
+
+    if(localBest){
+      bestBlob = localBest;
+      bestQuality = localBestQ;
+      break; // found a fit at this scale, good enough
+    }
+
+    // Even lowest quality too big at this scale — shrink dimensions and retry
+    scale *= 0.75;
+    if(w <= 32 || h <= 32){
+      // give up shrinking further, accept smallest we can produce
+      const q = 0.05;
+      const blob = await canvasToBlob(canvas, q);
+      bestBlob = blob;
+      bestQuality = q;
+      break;
+    }
+  }
+
+  progressEl.style.width = '100%';
+  return { blob: bestBlob, quality: bestQuality, scale };
+}
+
+async function processFile(file){
+  const id = 'card_' + Math.random().toString(36).slice(2);
+  fileCounter++;
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  renameBar.style.display = 'flex';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-body">
+      <div class="thumb"><img id="${id}_img" src=""></div>
+      <div class="info">
+        <div class="fname-edit">
+          <input type="text" class="fname-input" id="${id}_name" value="${baseName}" spellcheck="false">
+          <span class="ext-label">.webp</span>
+        </div>
+        <div class="stat-row">
+          <span>${fmtSize(file.size)}</span>
+          <span class="arrow">→</span>
+          <span id="${id}_result">compressing…</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill working" id="${id}_progress"></div></div>
+        <div class="status-text" id="${id}_status">reading image…</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn" id="${id}_download" disabled>Download</button>
+        <button class="btn secondary" id="${id}_retry" style="display:none;">Retry</button>
+      </div>
+    </div>
+  `;
+  resultsEl.appendChild(card);
+
+  try{
+    const { img, url } = await loadImage(file);
+    document.getElementById(id+'_img').src = url;
+
+    const targetBytes = Math.max(5, parseInt(targetKbInput.value || '100', 10)) * 1024;
+    const statusEl = document.getElementById(id+'_status');
+    const progressEl = document.getElementById(id+'_progress');
+
+    const { blob, quality, scale } = await compressToTarget(img, targetBytes, statusEl, progressEl);
+    progressEl.classList.remove('working');
+
+    const resultEl = document.getElementById(id+'_result');
+    const overOrUnder = blob.size <= targetBytes ? 'good' : 'over';
+    resultEl.innerHTML = `<span class="${overOrUnder}">${fmtSize(blob.size)}</span>`;
+
+    const dims = `${Math.round(img.naturalWidth*scale)}×${Math.round(img.naturalHeight*scale)}px`;
+    statusEl.textContent = `quality ${(quality*100).toFixed(0)}% · ${dims}${scale<1 ? ' (downscaled to hit target)' : ''}`;
+
+    const nameInputEl = document.getElementById(id+'_name');
+    const dlBtn = document.getElementById(id+'_download');
+    dlBtn.disabled = false;
+    dlBtn.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = sanitizeName(nameInputEl.value) + '.webp';
+      a.click();
+    });
+
+    processedFiles.push({ blob, nameInputEl, originalBase: baseName, ext: 'webp' });
+    downloadAllWrap.classList.add('show');
+
+  } catch(err){
+    const statusEl = document.getElementById(id+'_status');
+    statusEl.textContent = 'failed to process this file: ' + err.message;
+    document.getElementById(id+'_progress').classList.remove('working');
+    document.getElementById(id+'_progress').style.background = 'var(--warn)';
+    document.getElementById(id+'_progress').style.width = '100%';
+  }
+}
+
+// ---------- Video conversion (via ffmpeg.wasm, runs entirely in the browser) ----------
+
+let ffmpegInstance = null;
+let ffmpegLoadingPromise = null;
+let ffmpegLock = Promise.resolve();
+
+function withFfmpegLock(fn){
+  const run = ffmpegLock.then(fn, fn);
+  ffmpegLock = run.then(()=>{}, ()=>{});
+  return run;
+}
+
+let ffmpegLoadListeners = new Set();
+function broadcastFfmpegStatus(text){
+  ffmpegLoadListeners.forEach(el=>{ try{ el.textContent = text; }catch(e){} });
+}
+
+async function fetchBlobURL(url, mimeType, onChunk){
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('could not download ' + url.split('/').pop() + ' (HTTP ' + resp.status + ')');
+  const total = parseInt(resp.headers.get('Content-Length') || '0', 10);
+  if(!resp.body || typeof resp.body.getReader !== 'function'){
+    const blob = await resp.blob();
+    if(onChunk) onChunk(blob.size, total || blob.size);
+    return URL.createObjectURL(new Blob([blob], { type: mimeType }));
+  }
+  const reader = resp.body.getReader();
+  const chunks = [];
+  let received = 0;
+  while(true){
+    const { done, value } = await reader.read();
+    if(done) break;
+    chunks.push(value);
+    received += value.length;
+    if(onChunk) onChunk(received, total);
+  }
+  return URL.createObjectURL(new Blob(chunks, { type: mimeType }));
+}
+
+function withTimeout(promise, ms, message){
+  let timer;
+  const timeout = new Promise((_, reject)=>{ timer = setTimeout(()=> reject(new Error(message)), ms); });
+  return Promise.race([promise, timeout]).finally(()=> clearTimeout(timer));
+}
+
+async function getFFmpeg(statusEl){
+  if(ffmpegInstance) return ffmpegInstance;
+  if(statusEl){
+    ffmpegLoadListeners.add(statusEl);
+    statusEl.textContent = 'downloading video engine… (one-time, ~30MB)';
+  }
+  if(!ffmpegLoadingPromise){
+    ffmpegLoadingPromise = (async ()=>{
+      if(!window.FFmpegWASM || !window.FFmpegUtil){
+        throw new Error('video engine script did not load (check your internet connection, or that ad-block / a firewall isn\'t blocking unpkg.com)');
+      }
+      const { FFmpeg } = window.FFmpegWASM;
+      const coreBase = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/';
+      const ffmpegPkgURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd';
+
+      // The big .wasm file is identical in both builds, so download it once.
+      const downloads = [
+        { key:'wasm',   url: coreBase + 'esm/ffmpeg-core.wasm', mime:'application/wasm',   approx: 31 * 1024 * 1024 },
+        { key:'worker', url: ffmpegPkgURL + '/814.ffmpeg.js',    mime:'text/javascript',    approx: 15 * 1024 },
+        { key:'esm',    url: coreBase + 'esm/ffmpeg-core.js',    mime:'text/javascript',    approx: 130 * 1024 },
+        { key:'umd',    url: coreBase + 'umd/ffmpeg-core.js',    mime:'text/javascript',    approx: 130 * 1024 },
+      ];
+      const totalApprox = downloads.reduce((s, f)=> s + f.approx, 0);
+      let doneBytes = 0;
+      const urls = {};
+
+      try{
+        await withTimeout((async ()=>{
+          for(const f of downloads){
+            urls[f.key] = await fetchBlobURL(f.url, f.mime, (received)=>{
+              const pct = Math.min(99, Math.round(((doneBytes + received) / totalApprox) * 100));
+              broadcastFfmpegStatus(`downloading video engine… ${pct}% (one-time, ~30MB)`);
+            });
+            doneBytes += f.approx;
+          }
+        })(), 180000, 'video engine took too long to download — check your internet connection and try again');
+
+        // Try the ES-module core first, then fall back to the UMD core.
+        // Different browsers handle the worker's import of the core differently.
+        let lastErr = null;
+        for(const coreKey of ['esm', 'umd']){
+          const ffmpeg = new FFmpeg();
+          try{
+            broadcastFfmpegStatus('starting video engine…');
+            await withTimeout(
+              ffmpeg.load({ coreURL: urls[coreKey], wasmURL: urls.wasm, classWorkerURL: urls.worker }),
+              60000,
+              'video engine did not start (' + coreKey + ' build)'
+            );
+            ffmpegInstance = ffmpeg;
+            return ffmpeg;
+          }catch(e){
+            lastErr = e;
+            try{ ffmpeg.terminate(); }catch(_){}
+          }
+        }
+        throw lastErr || new Error('video engine could not be started');
+      }catch(loadErr){
+        ffmpegLoadingPromise = null; // allow retry on the next video
+        if(window.location.protocol === 'file:'){
+          throw new Error('this page was opened as a local file, which browsers block from starting the video engine. Serve this HTML through a local server (or host it online) instead of double-clicking it.');
+        }
+        throw loadErr;
+      }
+    })();
+  }
+  try{
+    return await ffmpegLoadingPromise;
+  } finally {
+    if(statusEl) ffmpegLoadListeners.delete(statusEl);
+  }
+}
+
+// ---------- Fast video engine: browser-native WebCodecs (hardware accelerated) ----------
+// This is the same idea as HandBrake's speed trick: let a real, optimised encoder do the work
+// (here the device's own hardware H.264 encoder) instead of a software encoder in WebAssembly.
+// If the browser or the file can't use it, we automatically fall back to ffmpeg.wasm.
+let fastLock = Promise.resolve();
+function withFastLock(fn){
+  const run = fastLock.then(fn, fn);
+  fastLock = run.then(()=>{}, ()=>{});
+  return run;
+}
+
+function webCodecsAvailable(){
+  return typeof VideoEncoder !== 'undefined' && typeof VideoDecoder !== 'undefined';
+}
+
+let mediabunnyPromise = null;
+async function getMediabunny(){
+  if(!mediabunnyPromise){
+    mediabunnyPromise = (async ()=>{
+      const urls = [
+        'https://esm.sh/mediabunny',
+        'https://cdn.jsdelivr.net/npm/mediabunny/+esm',
+      ];
+      let lastErr = null;
+      for(const u of urls){
+        try{
+          const m = await withTimeout(import(/* @vite-ignore */ u), 30000, 'fast engine took too long to load');
+          if(m && m.Conversion && m.Input && m.Output) return m;
+          lastErr = new Error('fast engine loaded but is missing expected parts');
+        }catch(e){ lastErr = e; }
+      }
+      mediabunnyPromise = null;
+      throw lastErr || new Error('fast engine could not be loaded');
+    })();
+  }
+  return mediabunnyPromise;
+}
+
+// Encodes with WebCodecs. Hardware encoders are quick but only roughly honour a bitrate,
+// so we make up to 4 quick passes, steering the bitrate toward the target size.
+async function encodeFast(file, o, statusEl, progressEl){
+  const MB = await getMediabunny();
+  const { Input, Output, Conversion, ALL_FORMATS, BlobSource, Mp4OutputFormat, BufferTarget } = MB;
+  let kbps = o.videoKbps;
+  let bestUnder = null, smallest = null;
+
+  for(let attempt = 1; attempt <= 4; attempt++){
+    const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+    const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+    const conversion = await Conversion.init({
+      input, output,
+      video: { width: o.outW, height: o.outH, fit: 'fill', bitrate: kbps * 1000 },
+      audio: o.dropAudio ? { discard: true } : { bitrate: o.audioKbps * 1000 },
+    });
+    if(!conversion.isValid){
+      throw new Error('fast mode cannot convert this file');
+    }
+    const lostVideo = (conversion.discardedTracks || []).some(t=>{
+      const tr = t && t.track;
+      return tr && (tr.type === 'video' || (typeof tr.isVideoTrack === 'function' && tr.isVideoTrack()));
+    });
+    if(lostVideo) throw new Error('fast mode cannot decode or encode this video format');
+
+    conversion.onProgress = (p)=>{
+      progressEl.style.width = Math.max(3, Math.min(97, Math.round(p * 97))) + '%';
+      statusEl.textContent = `encoding (fast mode)… ${Math.round(p * 100)}% · ${o.outW}×${o.outH} · ${kbps}kbps video` + (attempt > 1 ? ` · pass ${attempt}` : '');
+    };
+    await conversion.execute();
+
+    const buf = output.target.buffer;
+    if(!buf || !buf.byteLength) throw new Error('fast mode produced an empty file');
+    const rec = { blob: new Blob([buf], { type: 'video/mp4' }), size: buf.byteLength, kbps };
+    if(!smallest || rec.size < smallest.size) smallest = rec;
+    if(rec.size <= o.targetBytes && (!bestUnder || rec.size > bestUnder.size)) bestUnder = rec;
+
+    // Good enough: under target and using at least 85% of it.
+    if(bestUnder && bestUnder.size >= o.targetBytes * 0.85) break;
+    if(attempt === 4) break;
+    const next = Math.max(20, Math.round(kbps * ((o.targetBytes * 0.93) / rec.size)));
+    if(next === kbps || (kbps <= 20 && rec.size > o.targetBytes)) break;
+    statusEl.textContent = `result was ${fmtSize(rec.size)}, adjusting to ${next}kbps…`;
+    kbps = next;
+  }
+  const pick = bestUnder || smallest;
+  return { blob: pick.blob, kbps: pick.kbps };
+}
+
+function loadVideoMeta(file){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    v.muted = true;
+    v.src = url;
+    v.onloadedmetadata = ()=>{
+      resolve({ duration: v.duration || 0, width: v.videoWidth, height: v.videoHeight, url });
+    };
+    v.onerror = ()=>{
+      URL.revokeObjectURL(url);
+      reject(new Error('the browser could not read this video file'));
+    };
+  });
+}
+
+function guessExt(name){
+  const m = name.match(/\.[^.]+$/);
+  return m ? m[0] : '.mp4';
+}
+
+function errText(err){
+  if(!err) return 'unknown error';
+  if(typeof err === 'string') return err;
+  if(err.message) return err.message;
+  if(err.code) return String(err.code);
+  try{ return JSON.stringify(err); }catch(e){ return String(err); }
+}
+
+async function processVideoFile(file){
+  const id = 'card_' + Math.random().toString(36).slice(2);
+  fileCounter++;
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  renameBar.style.display = 'flex';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-body">
+      <div class="thumb"><video id="${id}_vid" muted playsinline preload="metadata"></video></div>
+      <div class="info">
+        <div class="fname-edit">
+          <input type="text" class="fname-input" id="${id}_name" value="${baseName}" spellcheck="false">
+          <span class="ext-label">.mp4</span>
+        </div>
+        <div class="stat-row">
+          <span>${fmtSize(file.size)}</span>
+          <span class="arrow">→</span>
+          <span id="${id}_result">preparing…</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill working" id="${id}_progress"></div></div>
+        <div class="status-text" id="${id}_status">reading video…</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn" id="${id}_download" disabled>Download</button>
+        <button class="btn secondary" id="${id}_retry" style="display:none;">Retry</button>
+      </div>
+    </div>
+  `;
+  resultsEl.appendChild(card);
+
+  const statusEl = document.getElementById(id+'_status');
+  const progressEl = document.getElementById(id+'_progress');
+  const resultEl = document.getElementById(id+'_result');
+
+  try{
+    const meta = await loadVideoMeta(file);
+    document.getElementById(id+'_vid').src = meta.url;
+    if(!meta.width || !meta.height || !meta.duration){
+      throw new Error('could not read this video\'s dimensions or duration');
+    }
+
+    const targetBytes = Math.max(5, parseInt(targetKbInput.value || '100', 10)) * 1024;
+    const duration = meta.duration;
+
+    // Work out output dimensions from the chosen resolution preset (never upscale).
+    const wantH = selectedVideoHeight > 0 ? Math.min(selectedVideoHeight, meta.height) : meta.height;
+    const willScale = wantH < meta.height;
+    let outW = Math.round(meta.width * (wantH / meta.height));
+    let outH = wantH;
+    outW -= outW % 2; // libx264 needs even dimensions
+    outH -= outH % 2;
+
+    // Work out a bitrate budget that should land close to the target size.
+    const overheadFactor = 0.95; // leave headroom for container overhead
+    const totalKbps = (targetBytes * 8 * overheadFactor) / duration / 1000;
+    let audioKbps = 96;
+    let videoKbps = Math.floor(totalKbps - audioKbps);
+    if(videoKbps < 80){
+      audioKbps = 48;
+      videoKbps = Math.floor(totalKbps - audioKbps);
+    }
+    let dropAudio = false;
+    if(videoKbps < 40){
+      // Not enough budget for audio at all: give every bit to the picture.
+      dropAudio = true;
+      audioKbps = 0;
+      videoKbps = Math.max(20, Math.floor(totalKbps));
+    }
+    let lowQualityWarning = totalKbps < 40;
+
+    let blob = null;
+    let engineUsed = 'compatible';
+    let finalVideoKbps = videoKbps;
+
+    // 1) Fast path: hardware-accelerated WebCodecs.
+    if(webCodecsAvailable()){
+      try{
+        statusEl.textContent = 'preparing fast mode…';
+        const fast = await withFastLock(()=> encodeFast(file, {
+          targetBytes, videoKbps, audioKbps, dropAudio, outW, outH
+        }, statusEl, progressEl));
+        blob = fast.blob;
+        finalVideoKbps = fast.kbps;
+        engineUsed = 'fast';
+      }catch(fastErr){
+        console.warn('Fast mode unavailable, falling back to ffmpeg.wasm:', fastErr);
+        statusEl.textContent = 'fast mode not available for this file, switching to compatible mode…';
+        progressEl.style.width = '3%';
+        blob = null;
+      }
+    }
+
+    // 2) Compatible path: ffmpeg.wasm (works with more formats, but slower).
+    if(!blob){
+    if(file.size > 700 * 1024 * 1024){
+      throw new Error('this video is over 700MB, which is too large for compatible-mode conversion — try a shorter clip');
+    }
+    const ffmpeg = await withFfmpegLock(()=> getFFmpeg(statusEl));
+
+    statusEl.textContent = `queued for encoding · ${outW}×${outH}`;
+
+    const inName = 'in_' + id + guessExt(file.name);
+    const outName = 'out_' + id + '.mp4';
+    let attemptNo = 1;
+    let active = false;
+
+    blob = await withFfmpegLock(async ()=>{
+      // Listeners are attached only while this video holds the engine, so a
+      // queued video never shows another video's progress or log lines.
+      active = true;
+      const logLines = [];
+      const onProgress = ({ progress })=>{
+        if(!active) return;
+        const pct = Math.min(97, Math.max(3, Math.round((progress || 0) * 100)));
+        progressEl.style.width = pct + '%';
+        statusEl.textContent = `encoding… ${pct}% · ${outW}×${outH} · ${finalVideoKbps}kbps video` + (attemptNo > 1 ? ` · pass ${attemptNo}` : '');
+      };
+      const onLog = ({ message })=>{
+        if(!active || !message) return;
+        logLines.push(message);
+        if(logLines.length > 25) logLines.shift();
+      };
+      ffmpeg.on('progress', onProgress);
+      ffmpeg.on('log', onLog);
+
+      try{
+        await ffmpeg.writeFile(inName, await window.FFmpegUtil.fetchFile(file));
+
+        let bestData = null;
+        let kbps = videoKbps;
+        for(attemptNo = 1; attemptNo <= 3; attemptNo++){
+          finalVideoKbps = kbps;
+          logLines.length = 0;
+          // Always force even dimensions: libx264 + yuv420p fails on odd sizes.
+          const vf = willScale
+            ? `scale=${outW}:${outH}`
+            : 'scale=trunc(iw/2)*2:trunc(ih/2)*2';
+          const args = ['-i', inName, '-vf', vf,
+            '-c:v','libx264','-preset','veryfast','-pix_fmt','yuv420p',
+            '-b:v', kbps+'k','-maxrate', kbps+'k','-bufsize', (kbps*2)+'k'];
+          if(dropAudio) args.push('-an');
+          else args.push('-c:a','aac','-b:a', audioKbps+'k');
+          args.push('-movflags','+faststart', '-y', outName);
+
+          const ret = await ffmpeg.exec(args);
+          if(ret !== 0){
+            throw new Error('ffmpeg could not convert this file' + (logLines.length ? ' — ' + logLines.slice(-3).join(' | ') : ' (exit code ' + ret + ')'));
+          }
+          let data;
+          try{
+            data = await ffmpeg.readFile(outName);
+          }catch(readErr){
+            throw new Error('no output was produced' + (logLines.length ? ' — ' + logLines.slice(-3).join(' | ') : '') + '. The video may use an unsupported codec or be corrupt.');
+          }
+          bestData = data;
+          try{ await ffmpeg.deleteFile(outName); }catch(e){}
+
+          // Landed under the target (or at the quality floor)? Done.
+          if(data.length <= targetBytes || kbps <= 20) break;
+          if(attemptNo === 3) break;
+          // Overshot: shrink the bitrate in proportion and try again.
+          const ratio = (targetBytes * 0.93) / data.length;
+          kbps = Math.max(20, Math.floor(kbps * ratio));
+          statusEl.textContent = `result was ${fmtSize(data.length)}, retrying at ${kbps}kbps…`;
+        }
+        return new Blob([bestData], { type: 'video/mp4' });
+      } finally {
+        active = false;
+        try{ ffmpeg.off('progress', onProgress); }catch(e){}
+        try{ ffmpeg.off('log', onLog); }catch(e){}
+        try{ await ffmpeg.deleteFile(inName); }catch(e){}
+        try{ await ffmpeg.deleteFile(outName); }catch(e){}
+      }
+    });
+
+    } // end compatible-mode fallback
+
+    videoKbps = finalVideoKbps;
+    progressEl.classList.remove('working');
+    progressEl.style.width = '100%';
+
+    const overOrUnder = blob.size <= targetBytes ? 'good' : 'over';
+    resultEl.innerHTML = `<span class="${overOrUnder}">${fmtSize(blob.size)}</span>`;
+    statusEl.textContent = `${engineUsed === 'fast' ? 'fast mode' : 'compatible mode'} · ${outW}×${outH} · ${videoKbps}kbps video, ${dropAudio ? 'audio removed to fit target' : audioKbps + 'kbps audio'}` +
+      (lowQualityWarning ? ' · target is very small for this length, quality will suffer' : '');
+
+    const nameInputEl = document.getElementById(id+'_name');
+    const dlBtn = document.getElementById(id+'_download');
+    dlBtn.disabled = false;
+    dlBtn.addEventListener('click', ()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = sanitizeName(nameInputEl.value) + '.mp4';
+      a.click();
+    });
+
+    processedFiles.push({ blob, nameInputEl, originalBase: baseName, ext: 'mp4' });
+    downloadAllWrap.classList.add('show');
+
+  } catch(err){
+    statusEl.textContent = 'failed to process this video: ' + errText(err);
+    progressEl.classList.remove('working');
+    progressEl.style.background = 'var(--warn)';
+    progressEl.style.width = '100%';
+  }
+}
+
+downloadAllBtn.addEventListener('click', ()=>{
+  processedFiles.forEach((f, i)=>{
+    setTimeout(()=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(f.blob);
+      a.download = sanitizeName(f.nameInputEl.value) + '.' + (f.ext || 'webp');
+      a.click();
+    }, i * 200);
+  });
+});
+
+// ---------- Separate Background Removal & Custom Background Feature ----------
+const bgDropzone = document.getElementById('bgDropzone');
+const bgFileInput = document.getElementById('bgFileInput');
+const bgResults = document.getElementById('bgResults');
+const btnRemoveBg = document.getElementById('btnRemoveBg');
+const btnClearBg = document.getElementById('btnClearBg');
+const bgTypeSelect = document.getElementById('bgType');
+const bgColorInput = document.getElementById('bgColor');
+const bgImageInput = document.getElementById('bgImageInput');
+const btnChooseBgImg = document.getElementById('btnChooseBgImg');
+
+let bgMode = 'solid';
+let bgEnabled = false; // false = keep cut-out transparent, true = put a background behind it
+const bgToggleBtns = document.querySelectorAll('#bgToggle .preset-btn');
+const bgOptionsEl = document.getElementById('bgOptions');
+let bgSolidColor = '#ffffff';
+let bgImageBitmap = null;
+
+// Store original & processed images for this section
+let bgSectionFiles = []; // { id, originalBlob, processedBlob, nameInputEl, imgEl }
+
+// The library only ships as an ES module (no UMD build), so it must be loaded
+// with a dynamic import() rather than a <script src="..."> tag.
+let bgRemovalFnPromise = null;
+let bgRemovalLoadListeners = new Set();
+function broadcastBgRemovalStatus(text){
+  bgRemovalLoadListeners.forEach(el=>{ try{ el.textContent = text; }catch(e){} });
+}
+
+function pickBgRemovalFn(mod){
+  if(!mod) return null;
+  const candidates = [
+    mod.default,
+    mod.default && mod.default.default,
+    mod.removeBackground,
+    mod.default && mod.default.removeBackground,
+  ];
+  for(const c of candidates){
+    if(typeof c === 'function') return c;
+  }
+  return null;
+}
+
+async function getBgRemovalFn(statusEl){
+  if(statusEl){
+    bgRemovalLoadListeners.add(statusEl);
+    statusEl.textContent = 'loading background-removal engine…';
+  }
+  if(!bgRemovalFnPromise){
+    bgRemovalFnPromise = (async ()=>{
+      const urls = [
+        'https://esm.sh/@imgly/background-removal',
+        'https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm',
+      ];
+      let lastErr = null;
+      for(const bgRemovalModuleUrl of urls){
+        try{
+          const mod = await withTimeout(
+            import(/* @vite-ignore */ bgRemovalModuleUrl),
+            60000,
+            'background-removal engine script took too long to load — check your internet connection'
+          );
+          const fn = pickBgRemovalFn(mod);
+          if(fn) return fn;
+          lastErr = new Error('background-removal library loaded from ' + bgRemovalModuleUrl + ' but did not export a usable function (found: ' + Object.keys(mod || {}).join(', ') + ')');
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      bgRemovalFnPromise = null;
+      if(window.location.protocol === 'file:'){
+        throw new Error('this page was opened as a local file, which browsers block from starting the background-removal engine. Serve this HTML through a local server (or host it online) instead of double-clicking it.');
+      }
+      throw lastErr || new Error('background-removal engine could not be loaded');
+    })();
+  }
+  try{
+    return await bgRemovalFnPromise;
+  } finally {
+    if(statusEl) bgRemovalLoadListeners.delete(statusEl);
+  }
+}
+
+// Helper: create Image from bitmap
+function createImageFromBitmap(bitmap) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    canvas.toBlob(blob => {
+      if (!blob) return reject(new Error('encode failed'));
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = url;
+    }, 'image/png');
+  });
+}
+
+// Draw image with chosen background
+async function drawWithBackground(srcImage, bgMode, bgSolidColor, bgImageBitmap) {
+  const w = srcImage.naturalWidth || srcImage.width;
+  const h = srcImage.naturalHeight || srcImage.height;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  if (bgMode === 'solid') {
+    ctx.fillStyle = bgSolidColor;
+    ctx.fillRect(0, 0, w, h);
+  } else if (bgMode === 'gradient') {
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(1, '#eae6dc');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+  } else if (bgMode === 'image' && bgImageBitmap) {
+    const iw = bgImageBitmap.naturalWidth || bgImageBitmap.width;
+    const ih = bgImageBitmap.naturalHeight || bgImageBitmap.height;
+    const scale = Math.max(w / iw, h / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = (w - dw) / 2;
+    const dy = (h - dh) / 2;
+    ctx.drawImage(bgImageBitmap, dx, dy, dw, dh);
+  }
+
+  ctx.drawImage(srcImage, 0, 0, w, h);
+  return canvas;
+}
+
+function setBgProcessed(f, blob, ext) {
+  f.imgEl.src = URL.createObjectURL(blob);
+  f.processedBlob = blob;
+  f.ext = ext;
+  if (f.extEl) f.extEl.textContent = '.' + ext;
+}
+
+// Render one image according to the current "background or not" choice.
+// Always composites from the transparent cut-out, so changing the color
+// repeatedly keeps working (it never paints over a previous result).
+async function renderBgForFile(f) {
+  if (!f.cutoutBlob) {
+    if (bgEnabled) f.resultEl.textContent = 'click "Remove background" first';
+    return;
+  }
+  if (!bgEnabled) {
+    setBgProcessed(f, f.cutoutBlob, 'png'); // transparent PNG
+    f.resultEl.textContent = 'background removed (transparent)';
+    return;
+  }
+  const srcUrl = URL.createObjectURL(f.cutoutBlob);
+  const srcImg = new Image();
+  srcImg.src = srcUrl;
+  await srcImg.decode().catch(() => {});
+  const canvas = await drawWithBackground(srcImg, bgMode, bgSolidColor, bgImageBitmap);
+  URL.revokeObjectURL(srcUrl);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.92));
+  setBgProcessed(f, blob, 'webp');
+  f.resultEl.textContent = 'background removed + new background added';
+}
+
+async function applyBackgroundToAll() {
+  for (const f of bgSectionFiles) await renderBgForFile(f);
+}
+
+function updateBgControlsVisibility() {
+  if (!bgTypeSelect || !bgColorInput || !btnChooseBgImg) return;
+  if (bgMode === 'solid') {
+    bgColorInput.style.display = 'inline-block';
+    btnChooseBgImg.style.display = 'none';
+  } else if (bgMode === 'gradient') {
+    bgColorInput.style.display = 'none';
+    btnChooseBgImg.style.display = 'none';
+  } else if (bgMode === 'image') {
+    bgColorInput.style.display = 'none';
+    btnChooseBgImg.style.display = 'inline-block';
+  }
+}
+
+// Handle file selection for this section
+function handleBgSectionFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  files.forEach(file => {
+    const id = 'bgcard-' + Math.random().toString(36).slice(2);
+    const baseName = file.name.replace(/\.[^.]+$/, '');
+    const origExt = ((file.name.match(/\.([^.]+)$/) || [])[1] || 'png').toLowerCase();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-body">
+        <div class="thumb"><img id="${id}-img" src="" alt=""></div>
+        <div class="info">
+          <div class="fname-edit">
+            <input type="text" class="fname-input" id="${id}-name" value="${baseName}" spellcheck="false">
+            <span class="ext-label" id="${id}-ext">.${origExt}</span>
+          </div>
+          <div class="stat-row">
+            <span>${(file.size/1024).toFixed(1)} KB</span>
+            <span class="arrow">→</span>
+            <span id="${id}-result">pending</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn" id="${id}-download" disabled>Download</button>
+        </div>
+      </div>
+    `;
+    bgResults.appendChild(card);
+
+    const imgEl = card.querySelector(`#${id}-img`);
+    const nameInputEl = card.querySelector(`#${id}-name`);
+    const dlBtn = card.querySelector(`#${id}-download`);
+    const resultEl = card.querySelector(`#${id}-result`);
+
+    const url = URL.createObjectURL(file);
+    imgEl.src = url;
+
+    const extEl = card.querySelector(`#${id}-ext`);
+    const entry = { id, originalBlob: file, processedBlob: null, cutoutBlob: null, ext: origExt, origExt, nameInputEl, imgEl, resultEl, dlBtn, extEl };
+    bgSectionFiles.push(entry);
+
+    dlBtn.disabled = false;
+    dlBtn.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(entry.processedBlob || file);
+      a.download = (nameInputEl.value || baseName) + '.' + entry.ext;
+      a.click();
+    });
+
+    resultEl.textContent = 'ready';
+  });
+}
+
+bgDropzone.addEventListener('click', () => bgFileInput.click());
+bgDropzone.addEventListener('dragover', e => { e.preventDefault(); bgDropzone.classList.add('drag'); });
+bgDropzone.addEventListener('dragleave', () => bgDropzone.classList.remove('drag'));
+bgDropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  bgDropzone.classList.remove('drag');
+  handleBgSectionFiles(e.dataTransfer.files);
+});
+bgFileInput.addEventListener('change', e => handleBgSectionFiles(e.target.files));
+
+// Remove background for all images in this section
+if (btnRemoveBg) {
+  btnRemoveBg.addEventListener('click', async () => {
+    for (const f of bgSectionFiles) {
+      const statusEl = f.resultEl;
+      try {
+        const removeBg = await getBgRemovalFn(statusEl);
+        statusEl.textContent = 'removing background… (first use downloads an AI model, ~40MB)';
+        const srcBlob = f.originalBlob;
+        const resultBlob = await withTimeout(
+          removeBg(srcBlob, {
+            model: 'small',
+            progress: (key, current, total) => {
+              if (total) {
+                const pct = Math.round((current / total) * 100);
+                statusEl.textContent = `removing background… ${pct}% (${key})`;
+              }
+            }
+          }),
+          180000,
+          'background removal took too long — check your internet connection and try again'
+        );
+        f.cutoutBlob = resultBlob;
+        await renderBgForFile(f);
+      } catch (err) {
+        statusEl.textContent = 'failed: ' + errText(err);
+      }
+    }
+  });
+}
+
+// Reset: reload original images
+if (btnClearBg) {
+  btnClearBg.addEventListener('click', () => {
+    for (const f of bgSectionFiles) {
+      const url = URL.createObjectURL(f.originalBlob);
+      f.imgEl.src = url;
+      f.processedBlob = null;
+      f.cutoutBlob = null;
+      f.ext = f.origExt;
+      if (f.extEl) f.extEl.textContent = '.' + f.origExt;
+      f.resultEl.textContent = 'reset';
+    }
+  });
+}
+
+// "No background" / "Add background" toggle
+bgToggleBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    bgToggleBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    bgEnabled = btn.dataset.bgon === 'on';
+    bgOptionsEl.style.display = bgEnabled ? 'flex' : 'none';
+    updateBgControlsVisibility();
+    applyBackgroundToAll();
+  });
+});
+
+// Background type change
+if (bgTypeSelect) {
+  bgTypeSelect.addEventListener('change', () => {
+    bgMode = bgTypeSelect.value;
+    updateBgControlsVisibility();
+    applyBackgroundToAll();
+  });
+}
+
+// Solid color change
+if (bgColorInput) {
+  bgColorInput.addEventListener('input', () => {
+    bgSolidColor = bgColorInput.value;
+    if (bgMode === 'solid') applyBackgroundToAll();
+  });
+}
+
+// Choose background image
+if (btnChooseBgImg) {
+  btnChooseBgImg.addEventListener('click', () => bgImageInput.click());
+}
+if (bgImageInput) {
+  bgImageInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      bgImageBitmap = img;
+      bgMode = 'image';
+      bgTypeSelect.value = 'image';
+      updateBgControlsVisibility();
+      applyBackgroundToAll();
+    };
+    img.src = url;
+  });
+}
+
+updateBgControlsVisibility();
+// ---------- End Background Removal Section ----------
+</script>
+</body>
+</html>
